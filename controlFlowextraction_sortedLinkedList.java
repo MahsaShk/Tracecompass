@@ -123,24 +123,24 @@ public class controlFlowExtraction extends TmfAbstractAnalysisModule {
 
 
     private static void writeFeatures(ITmfStateSystem stateSystem, String outpDir) {
-        List<Integer> quarks = stateSystem.getQuarks("Threads", "*", "System_call");
+        List<Integer> syscalls_quarks = stateSystem.getQuarks("Threads", "*", "System_call");
         List<Integer> exec_name_quarks = stateSystem.getQuarks("Threads", "*", "Exec_name");
         Integer[] integers = new Integer[1];
         integers[0] = 1033;
         List<Integer> threads_quarks = stateSystem.getQuarks("Threads","*");
 
-        checkNotNull(quarks);
+        checkNotNull(syscalls_quarks);
         long start = stateSystem.getStartTime();
         long end = stateSystem.getCurrentEndTime();
         long duration = (end -start);
         System.out.println("duration"+duration);
 
         Iterable<ITmfStateInterval> iterable=null;
-        Iterable<ITmfStateInterval> exec_name_iterable=null;
+        Iterable<ITmfStateInterval> proc_name_iterable=null;
         Iterable<ITmfStateInterval> threads_iterable=null;
         try {
-            iterable = stateSystem.query2D(quarks, start, end);
-            exec_name_iterable = stateSystem.query2D(exec_name_quarks, start, end);
+            syscalls_iterable = stateSystem.query2D(syscalls_quarks, start, end);
+            proc_name_iterable = stateSystem.query2D(proc_name_quarks, start, end);
             threads_iterable = stateSystem.query2D(threads_quarks, start, end);
 
         } catch (IndexOutOfBoundsException | TimeRangeException | StateSystemDisposedException e2) {
@@ -149,7 +149,7 @@ public class controlFlowExtraction extends TmfAbstractAnalysisModule {
         }
 
         /*
-        for (ITmfStateInterval interval : exec_name_iterable) {//iterate over all intervals and collect metrics
+        for (ITmfStateInterval interval : proc_name_iterable) {//iterate over all intervals and collect metrics
             Integer quark = interval.getAttribute();
             Object tmp = interval.getValue();
             if (tmp!=null) {
@@ -165,7 +165,7 @@ public class controlFlowExtraction extends TmfAbstractAnalysisModule {
         }
         */
 
-       /* for (ITmfStateInterval interval : iterable) {//iterate over all intervals and collect metrics
+       /* for (ITmfStateInterval interval : syscalls_iterable) {//iterate over all intervals and collect metrics
             Integer quark = interval.getAttribute();
             System.out.println(interval);
             System.out.println(quark);
@@ -178,7 +178,7 @@ public class controlFlowExtraction extends TmfAbstractAnalysisModule {
         {
             for (ITmfStateInterval interval : threads_iterable) {//iterate over all intervals and collect metrics
                Integer quark = interval.getAttribute();
-               if (quark ==1033) { // find based on Exec_name =="mysql"
+               if (quark ==1033) { // find based on proc_name =="mysql"
                    if (ll_sortedIntervals.size() == 0) {
                     ll_sortedIntervals.add(0,interval);
 
